@@ -1,4 +1,13 @@
-from threading import Lock, Thread
+"""
+
+Game Logic For the Keyboard game - this is a safe
+threaded singleton implementation because this resource is
+being used by a lot of threads
+
+
+"""
+
+from threading import Lock
 
 
 class SingletonMeta(type):
@@ -43,7 +52,7 @@ class GameLogicSingleton(metaclass=SingletonMeta):
 
     def __init__(self) -> None:
         super().__init__()
-        # key = name of group, value = port
+        # key = name of group, tcp connection
         self.group1 = {}
         self.group2 = {}
         self.game_running = False
@@ -51,6 +60,10 @@ class GameLogicSingleton(metaclass=SingletonMeta):
         self.group2_score = 0
 
     def reset(self):
+        """
+        reset all params of the game
+        :return:
+        """
         self.group1 = {}
         self.group2 = {}
         self.game_running = False
@@ -58,6 +71,12 @@ class GameLogicSingleton(metaclass=SingletonMeta):
         self.group2_score = 0
 
     def assign_team_to_group(self, name: str, connection):
+        """
+        will assign the team to a certain group - randomly
+        :param name: name of the team we want to assign
+        :param connection: the team tcp connection
+        :return: none
+        """
         if name not in self.group1 and name not in self.group2:
             if len(self.group1) > len(self.group2):
                 print(f"group: {name} is now added to group2")
@@ -69,6 +88,12 @@ class GameLogicSingleton(metaclass=SingletonMeta):
             print(f"group: {name} rejected becasue it's already in a group")
 
     def add_score_to_group(self, team, score_to_add):
+        """
+        giving the score of the group that related to the team that submitted those chars
+        :param team: name of the team to add the score
+        :param score_to_add: number of chars to add
+        :return:
+        """
         print(f"adding score: {score_to_add} from team: {team}")
         if team in self.group1:
             self.group1_score += score_to_add
@@ -76,6 +101,9 @@ class GameLogicSingleton(metaclass=SingletonMeta):
             self.group2_score += score_to_add
 
     def generate_welcome_msg(self):
+        """
+        :return: generate welcoming string according to the teams in the groups
+        """
         return 'Welcome to Keyboard Spamming Battle Royale.\nGroup 1:\n==\n' + "".join(
             key + "\n" for key in self.group1.keys()) + "\nGroup 2:\n==\n" + "".join(
             key + "\n" for key in self.group2.keys()) + "Start pressing keys on your keyboard as fast as you can!!\n"
@@ -88,5 +116,9 @@ class GameLogicSingleton(metaclass=SingletonMeta):
 
 
 def get_instance() -> GameLogicSingleton:
+    """
+    safe way to get into the singleton
+    :return: the singleton
+    """
     singleton = GameLogicSingleton()
     return singleton
