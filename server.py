@@ -62,7 +62,7 @@ def listen_and_count_team(team_name, connection):
             print(e)
             continue
         finally:
-            time.sleep(1)
+            time.sleep(0.25)
 
 
 if __name__ == '__main__':
