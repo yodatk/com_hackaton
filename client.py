@@ -10,6 +10,12 @@ from struct import unpack_from
 from global_params import *
 import threading
 import time
+import sys
+
+# printing to sys.out without buffer
+from unbuffered import Unbuffered
+
+sys.stdout = Unbuffered(sys.stdout)
 
 # global param to know if the current game ended
 game_ended = False
