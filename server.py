@@ -136,7 +136,6 @@ if __name__ == '__main__':
                 random.shuffle(keys)
                 # start listening for teams chars
                 for team_name in keys:
-                    print(team_name)
                     team_connection = groups[team_name]
                     thread_pool_executor.submit(listen_and_count_team, team_name, team_connection)
 
