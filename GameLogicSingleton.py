@@ -60,11 +60,16 @@ class GameLogicSingleton(metaclass=SingletonMeta):
     def assign_team_to_group(self, name: str, connection):
         if name not in self.group1 and name not in self.group2:
             if len(self.group1) > len(self.group2):
+                print(f"group: {name} is now added to group2")
                 self.group2[name] = connection
             else:
+                print(f"group: {name} is now added to group1")
                 self.group1[name] = connection
+        else:
+            print(f"group: {name} rejected becasue it's already in a group")
 
     def add_score_to_group(self, team, score_to_add):
+        print(f"adding score: {score_to_add} from team: {team}")
         if team in self.group1:
             self.group1_score += score_to_add
         elif team in self.group2:
@@ -80,12 +85,6 @@ class GameLogicSingleton(metaclass=SingletonMeta):
         winners = "\n".join(
             [team_name for team_name in (self.group1 if self.group1_score > self.group2_score else self.group2)])
         return 'Game over!\n' + f"Group 1 typed in {self.group1_score} characters. Group 2 typed in {self.group2_score} characters.\n" + winner_group_num + "Congratulations to the winners:\n==\n" + winners
-
-    def some_business_logic(self):
-        """
-        Finally, any singleton should define some business logic, which can be
-        executed on its instance.
-        """
 
 
 def get_instance() -> GameLogicSingleton:
