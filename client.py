@@ -47,7 +47,7 @@ def main():
     udp_socket.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
     udp_socket.bind((EMPTY_IP, DESTINATION_PORT))
 
-    print("Do Ctrl+c to exit the program !!")
+    print("Client started, listening for offer requests")
 
     # Let'udp_socket send data through UDP protocol
     while True:
