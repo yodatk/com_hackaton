@@ -22,13 +22,15 @@ def get_input_and_send_to_server(tcp_socket):
     :return: none
     """
     global game_ended
-    try:
-        user_input = input('')
-        if not game_ended:
-            tcp_socket.sendall(user_input.encode('utf-8'))
-    except:
-        # catch any exception that can occur from ilegal keys that entered by user
-        pass
+
+    while not game_ended:
+        try:
+            user_input = input('')
+            if not game_ended:
+                tcp_socket.sendall(user_input.encode('utf-8'))
+        except:
+            # catch any exception that can occur from ilegal keys that entered by user
+            pass
 
 
 def main():
@@ -82,6 +84,7 @@ def main():
                 # close all connection
                 tcp_socket.shutdown(socket.SHUT_RDWR)
                 tcp_socket.close()
+                print("Server disconnected, listening for offer requests...")
 
         except struct.error as e:
             # server with address info: ({address[0]},{address[1]}) didn't send corrent data"
@@ -94,7 +97,7 @@ def main():
             # catch any other unexpected error to keep client alive and flow
             pass
         finally:
-            print("Server disconnected, listening for offer requests...")
+
             time.sleep(1)
 
 
