@@ -1,3 +1,9 @@
+'''
+
+server module - accept connections from team 
+for a keyboard game and calculate results
+
+'''
 import socket
 import threading
 from concurrent.futures.thread import ThreadPoolExecutor
@@ -7,10 +13,19 @@ from global_params import *
 from struct import pack
 import random
 from scapy.arch import get_if_addr
+from unbuffered import Unbuffered
+import sys
+# printing to sys.out without buffer
+sys.stdout = Unbuffered(sys.stdout)
 
 
 
 def parse_join_tcp_msg(data: str):
+    """
+    
+    :return: data
+
+    """
     if data.strip() == '':
         return None
     else:
@@ -33,7 +48,7 @@ def receive_tcp_offers():
     while True:
         connection, client_address = tcp_socket.accept()  # .recvfrom(MAX_UDP_MSG_SIZE)
         if not GameLogicSingleton.get_instance().game_running:
-            data = connection.recv(MAX_TCP_SIZE_BUFFER)
+            data = connection.recv(MAX_SIZE_BUFFER)
             print("got new tcp connection")
             team_name = parse_join_team_name_msg(data.decode('utf-8'))
             print(f"team: {team_name} establish connection")
@@ -54,13 +69,15 @@ def send_msg_to_players(to_send_connection, msg):
 def listen_and_count_team(team_name, connection):
     while True:
         try:
-            data = connection.recv(MAX_TCP_SIZE_BUFFER)
+            data = connection.recv(MAX_SIZE_BUFFER)
             if data is not None and len(data) > 0 and GameLogicSingleton.get_instance().game_running:
-                score = len(parse_join_tcp_msg(data.decode('utf-8')))
-                GameLogicSingleton.get_instance().add_score_to_group(team_name, score_to_add=score)
+                chars_after_decode = parse_join_tcp_msg(data.decode('utf-8')) 
+                if chars_after_decode is not None:
+                    score = len(chars_after_decode)
+                    GameLogicSingleton.get_instance().add_score_to_group(team_name, score_to_add=score)
         except Exception as e:
-            print(e)
-            continue
+            #print(e)
+            pass
         finally:
             time.sleep(0.25)
 
@@ -128,7 +145,7 @@ if __name__ == '__main__':
         finally:
             print("game is finished - restarting")
             GameLogicSingleton.get_instance().reset()
-            print("finished restart")
+            
             
 
 
