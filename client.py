@@ -64,7 +64,7 @@ def main():
                 tcp_socket.connect((address[0], port))
 
                 # TCP connection established with server - sending Team Name
-                tcp_socket.sendall('YOGA MASTERS\n'.encode('utf-8'))
+                tcp_socket.sendall(TEAM_NAME.encode('utf-8'))
 
                 # Waiting for Start Game Message from Server
                 start_game_msg = tcp_socket.recv(MAX_SIZE_BUFFER)
