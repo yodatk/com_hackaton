@@ -8,8 +8,6 @@ from struct import pack, unpack
 import random
 
 
-
-
 def parse_join_tcp_msg(data: str):
     if data.strip() == '':
         return None
@@ -54,7 +52,6 @@ def listen_and_count_team(team_name, connection):
             score = len(parse_join_tcp_msg(data.decode('utf-8')))
             GameLogicSingleton.get_instance().add_score_to_group(team_name, score_to_add=score)
         except Exception as e:
-            print(e)
             continue
 
 
@@ -81,30 +78,31 @@ if __name__ == '__main__':
     # game is now running, cannot accept more teams
     GameLogicSingleton.get_instance().game_running = True
     groups = {**GameLogicSingleton.get_instance().group1, **GameLogicSingleton.get_instance().group2}
-    keys = list(groups.keys())
-    random.shuffle(keys)
-    thread_pool_executor = ThreadPoolExecutor(max_workers=len(keys))
-    for team_name in keys:
-        thread_pool_executor.submit(send_msg_to_players, groups[team_name],
-                                    GameLogicSingleton.get_instance().generate_welcome_msg())
-    thread_pool_executor.shutdown(wait=True)
-    thread_pool_executor = ThreadPoolExecutor(max_workers=len(keys))
-    random.shuffle(keys)
-    for team_name in keys:
-        team_connection = groups[team_name]
-        thread_pool_executor.submit(listen_and_count_team, team_name, team_connection)
+    if len(groups) >= 1:
+        keys = list(groups.keys())
+        random.shuffle(keys)
+        thread_pool_executor = ThreadPoolExecutor(max_workers=len(keys))
+        for team_name in keys:
+            thread_pool_executor.submit(send_msg_to_players, groups[team_name],
+                                        GameLogicSingleton.get_instance().generate_welcome_msg())
+        thread_pool_executor.shutdown(wait=True)
+        thread_pool_executor = ThreadPoolExecutor(max_workers=len(keys))
+        random.shuffle(keys)
+        for team_name in keys:
+            team_connection = groups[team_name]
+            thread_pool_executor.submit(listen_and_count_team, team_name, team_connection)
 
-    # main thread -> wait for game to finish
-    timeout = time.time() + OFFER_TIME_OUT
-    while time.time() < timeout:
-        continue
-    thread_pool_executor.shutdown(wait=False)
+        # main thread -> wait for game to finish
+        timeout = time.time() + OFFER_TIME_OUT
+        while time.time() < timeout:
+            continue
+        thread_pool_executor.shutdown(wait=False)
 
-    random.shuffle(keys)
-    thread_pool_executor = ThreadPoolExecutor(max_workers=len(keys))
-    for team_name in keys:
-        thread_pool_executor.submit(send_msg_to_players, groups[team_name],
-                                    GameLogicSingleton.get_instance().generate_end_msg())
+        random.shuffle(keys)
+        thread_pool_executor = ThreadPoolExecutor(max_workers=len(keys))
+        for team_name in keys:
+            thread_pool_executor.submit(send_msg_to_players, groups[team_name],
+                                        GameLogicSingleton.get_instance().generate_end_msg())
 
     # while True:
     #     print("####### Server is listening #######")
